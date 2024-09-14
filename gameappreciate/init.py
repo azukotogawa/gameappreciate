@@ -1,4 +1,3 @@
-import window
+import gameEngine
 
-windowInit = window.Start()
-windowInit.run()
+gameEngine.run()
