@@ -1,3 +1,0 @@
-import gameEngine
-
-gameEngine.run()

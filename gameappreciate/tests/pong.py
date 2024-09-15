@@ -8,8 +8,6 @@ WHITE = sdl2.ext.Color(255, 255, 255)
 PADDLE_SPEED = 3
 BALL_SPEED = 3
 
-# Create a resource, so we have easy access to the example images.
-RESOURCES = sdl2.ext.Resources(__file__, "resources")
 
 class CollisionSystem(sdl2.ext.Applicator):
     def __init__(self, minx, miny, maxx, maxy):
@@ -174,11 +172,17 @@ class Ball(sdl2.ext.Entity):
 
 def run():
     sdl2.ext.init()
-    window = sdl2.ext.Window("gameAppreciate", size=(800, 600))
+    window = sdl2.ext.Window("The Pong Game", size=(800, 600))
     window.show()
 
-    renderer = sdl2.ext.Renderer(window)
-    factory = sdl2.ext.SpriteFactory(sdl2.ext.TEXTURE, renderer=renderer)
+    if "-hardware" in sys.argv:
+        print("Using hardware acceleration")
+        renderer = sdl2.ext.Renderer(window)
+        factory = sdl2.ext.SpriteFactory(sdl2.ext.TEXTURE, renderer=renderer)
+    else:
+        print("Using software rendering")
+        factory = sdl2.ext.SpriteFactory(sdl2.ext.SOFTWARE)
+
     # Create the paddles - we want white ones. To keep it easy enough for us,
     # we create a set of surfaces that can be used for Texture- and
     # Software-based sprites.
@@ -191,8 +195,10 @@ def run():
     movement = MovementSystem(0, 0, 800, 600)
     collision = CollisionSystem(0, 0, 800, 600)
     aicontroller = TrackingAIController(0, 600)
-
-    spriterenderer = TextureRenderSystem(renderer)
+    if factory.sprite_type == sdl2.ext.SOFTWARE:
+        spriterenderer = SoftwareRenderSystem(window)
+    else:
+        spriterenderer = TextureRenderSystem(renderer)
 
     world.add_system(aicontroller)
     world.add_system(movement)
